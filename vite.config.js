@@ -11,14 +11,6 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   plugins: [
     react(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: 'public/fonts',
-          dest: 'fonts'
-        }
-      ]
-    }),
     cssInjectedByJsPlugin()
   ],
   resolve: {
