@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import svgr from "vite-plugin-svgr";
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 import { fileURLToPath } from "url";
 
@@ -11,7 +11,14 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   plugins: [
     react(),
-    svgr(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'public/fonts',
+          dest: 'fonts'
+        }
+      ]
+    })
   ],
   resolve: {
     alias: {
