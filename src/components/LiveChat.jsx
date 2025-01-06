@@ -39,15 +39,44 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
     const files = Array.from(event.target.files);
     const imageUrls = files.map(file => URL.createObjectURL(file));
     setImageList(prevImages => [...prevImages, ...imageUrls]);
-    setShowImagePicker(true);
   };
 
   const handleRemoveImage = (index) => {
     setImageList(prevImages => prevImages.filter((_, i) => i !== index));
   };
 
+  const handleInput = (e) => {
+    let html = e.currentTarget.innerHTML;
+    html = html.replace(/<br>/g, '<br/>');
+    html = html.replace(/&nbsp;/g, ' ');
+    setInputStr(html);
+
+  };
+
+  const handlePaste = (event) => {
+    event.preventDefault();
+    const clipboardData = event.clipboardData;
+    const items = clipboardData.items;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const file = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          setImageList((prevList) => [...prevList, event.target.result]);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const text = clipboardData.getData("text");
+        document.execCommand("insertText", false, text);
+      }
+    }
+  };
+
   useEffect(() => {
-    if (imageList.length === 0) {
+    if (imageList.length > 0) {
+      setShowImagePicker(true);
+    } else {
       setShowImagePicker(false);
     }
   }, [imageList]);
@@ -66,6 +95,7 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
 
   const handleSubmit = () => {
     console.log("input", inputStr);
+    console.log("image", imageList);
     const url = isValidURL(inputStr);
 
     if (url) {
@@ -171,12 +201,8 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
             <p
               className="chat_input"
               contentEditable 
-              onInput={e => {
-                let html = e.currentTarget.innerHTML;
-                html = html.replace(/<br>/g, '<br/>');
-                html = html.replace(/&nbsp;/g, ' ');
-                setInputStr(html);
-              }}
+              onInput={handleInput}
+              onPaste={handlePaste}
               suppressContentEditableWarning={true}
               placeholder="Reply...">
             </p>
@@ -554,7 +580,7 @@ const LiveChatWrapper = styled.section`
   }
   .chat_input {
     color: ${(props) => props.theme === "dark" ? "#FFF" : "#0d082c"};
-    background-color: #f0f2f5;
+    background-color: ${(props) => props.theme === "dark" ? "black" : "#f0f2f5"};
     outline: none;
     position: absolute;
     overflow-y: auto;

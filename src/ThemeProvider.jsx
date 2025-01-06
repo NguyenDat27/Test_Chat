@@ -9,7 +9,7 @@ export const ThemeProvider = ({ children }) => {
 
     const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    setTheme(darkModeMediaQuery.matches ? "light" : "light");
+    setTheme(darkModeMediaQuery.matches ? "dark" : "light");
 
     const handleChange = (e) => {
       setTheme(e.matches ? "dark" : "light");
