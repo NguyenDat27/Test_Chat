@@ -19,6 +19,7 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
   const { theme } = useTheme();
 
   const [inputStr, setInputStr] = useState("");
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [imageList, setImageList] = useState([]);
@@ -52,7 +53,28 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
   }, [imageList]);
 
 
+  // Hàm kiểm tra url
+  const isValidURL = (str) => {
+    const pattern = new RegExp('^(https?:\\/\\/)?'+
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+
+      '((\\d{1,3}\\.){3}\\d{1,3}))'+
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
+      '(\\?[;&a-z\\d%_.~+=-]*)?'+
+      '(\\#[-a-z\\d_]*)?$','i');
+    return !!pattern.test(str);
+  };
 
+  const handleSubmit = () => {
+    console.log("input", inputStr);
+    const url = isValidURL(inputStr);
+
+    if (url) {
+      console.log("url", inputStr);
+    } else {
+      console.log("text", inputStr);
+    }
+    
+  };
   return (
     <>
       <LiveChatWrapper theme={theme} isLiveChatVisible={isLiveChatVisible}>
@@ -140,18 +162,24 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
             <div className="input_container">
               <img 
                 src={theme === 'dark' 
-                  ? emojiDarkIcon 
+                  ? emojiDarkIcon
                   : emojiLightIcon} 
                 alt="emoji" 
                 onClick={() => setShowEmojiPicker((val) => !val)}
               />
-              <input className="chat_input"
-                type="text"
-                placeholder="Reply ..." 
-                value={inputStr}
-                onChange={e => setInputStr(e.target.value)}
-              />
             </div>
+            <p
+              className="chat_input"
+              contentEditable 
+              onInput={e => {
+                let html = e.currentTarget.innerHTML;
+                html = html.replace(/<br>/g, '<br/>');
+                html = html.replace(/&nbsp;/g, ' ');
+                setInputStr(html);
+              }}
+              suppressContentEditableWarning={true}
+              placeholder="Reply...">
+            </p>
             <div className="button_container">
               <img
                 src={
@@ -169,7 +197,7 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
                 ref={fileInputRef}
                 onChange={handleFileChange}
               />
-              <div className="button_send">
+              <div className="button_send" onClick={handleSubmit}>
                   <img className="arrow" src={arrowIcon} alt="arrow" />
               </div>
             </div>
@@ -504,6 +532,7 @@ const LiveChatWrapper = styled.section`
   }
   .liveChat_input {
     display: flex;
+    position: relative;
     padding: 20px 30px;
     justify-content: space-between;
     align-items: center;
@@ -511,8 +540,6 @@ const LiveChatWrapper = styled.section`
     border-radius: 0px 0px 8px 8px;
     background: ${(props) => props.theme === "dark" ? "#0d082c" : "#FFF"};
     border-top: 1px solid ${(props) => props.theme === "dark" ? "#181045" : "rgba(0, 0, 0, 0.05)"};
-    bottom: 0;
-    left: 0;
     width: 100%;
     gap: 10px;
     @media (max-width: 768px) {
@@ -525,17 +552,23 @@ const LiveChatWrapper = styled.section`
       border-radius: 0;
     }
   }
+  .chat_input {
+    color: ${(props) => props.theme === "dark" ? "#FFF" : "#0d082c"};
+    background-color: #f0f2f5;
+    outline: none;
+    position: absolute;
+    overflow-y: auto;
+    max-height: 90px;
+    width: 50%;
+    left: 65px;
+    border-radius: 10px;
+    padding: 5px;
+  }
   .input_container {
     display: flex;
     img {
       cursor: pointer;
       margin-right: 20px;
-    }
-    .chat_input {
-      color: ${(props) => props.theme === "dark" ? "#FFF" : "#0d082c"};
-      background-color: transparent;
-      // outline: none;
-      // width: 200px;
     }
     @media (max-width: 360px) {
       gap: 5px;
