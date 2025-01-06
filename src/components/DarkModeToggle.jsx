@@ -7,7 +7,7 @@ const DarkModeToggle = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <label className="switch z-10000">
+    <label className="switch z-10000 fixed">
       <input id="input" type="checkbox" checked={theme === "dark"} onChange={toggleTheme} />
       <div className="slider round">
         <div className="sun-moon">

@@ -43,7 +43,7 @@ const close = keyframes`
 const ButtonChatContainer = styled.div`
   opacity: ${(props) => (props.isLiveChatVisible ? 0 : 1)};
   visibility: ${(props) => (props.isLiveChatVisible ? 'hidden' : 'visible')};
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 9999;

@@ -152,7 +152,7 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
 const LiveChatWrapper = styled.section`
   opacity: ${(props) => (props.isLiveChatVisible ? 1 : 0)};
   visibility: ${(props) => (props.isLiveChatVisible ? 'visible' : 'hidden')};
-  position: absolute;
+  position: fixed;
   right: 10px;
   bottom: 30px;
   animation: ${(props) => (props.isLiveChatVisible ? open : close)} 0.5s ease-in-out;
