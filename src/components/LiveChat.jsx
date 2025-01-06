@@ -7,7 +7,7 @@ import ImagePicker from"@/components/display/ImagePicker.jsx";
 // import svg
 import cIcon from "@/assets/images/icons/c.svg";
 import closeIcon from "@/assets/images/icons/close.svg";
-import avatarIcon from "@/assets/images/assistant.png";
+import avatarIcon from "@/assets/images/assistant.svg";
 import emojiLightIcon from "@/assets/images/icons/emoji_light.svg";
 import emojiDarkIcon from "@/assets/images/icons/emoji_dark.svg";
 import imageLightIcon from "@/assets/images/icons/image_light.svg";
@@ -501,8 +501,10 @@ const LiveChatWrapper = styled.section`
     img {
       cursor: pointer;
     }
-    input {
+    .input {
       color: ${(props) => props.theme === "dark" ? "#FFF" : "#0d082c"};
+      background-color: transparent;
+      outline: none;
     }
     @media (max-width: 360px) {
       gap: 10px;

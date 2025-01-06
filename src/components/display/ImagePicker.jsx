@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTheme } from '@/ThemeProvider.jsx';
 
-import imagePicker from '@/assets/images/imagepicker.png';
+import imagePicker from '@/assets/images/imagepicker.svg';
 import uploadIcon from '@/assets/images/icons/upload.svg';
 
 export default function ImagePicker() {
