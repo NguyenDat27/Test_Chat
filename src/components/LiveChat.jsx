@@ -558,7 +558,7 @@ const LiveChatWrapper = styled.section`
     outline: none;
     position: absolute;
     overflow-y: auto;
-    max-height: 90px;
+    max-height: 60px;
     width: 50%;
     left: 65px;
     border-radius: 10px;
