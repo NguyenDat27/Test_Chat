@@ -37,8 +37,14 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
-    const imageUrls = files.map(file => URL.createObjectURL(file));
-    setImageList(prevImages => [...prevImages, ...imageUrls]);
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        setImageList((prevList) => [...prevList, event.target.result]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleRemoveImage = (index) => {
