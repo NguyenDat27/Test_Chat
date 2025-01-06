@@ -27,8 +27,8 @@ export default defineConfig({
         embed: path.resolve(__dirname, 'src/embed.jsx'),
       },
       output: {
-        entryFileNames: '[name].jsx',
-        format: 'iife',
+        entryFileNames: '[name].js',
+        format: 'es',
         name: 'LiveChat',
       },
     },
