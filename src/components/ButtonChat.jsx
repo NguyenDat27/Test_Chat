@@ -61,16 +61,19 @@ const ButtonChatContainer = styled.div`
     background: #4629f2;
     box-shadow: 0px 30px 60px 0px rgba(70, 41, 242, 0.43);
     cursor: pointer;
-    @media (max-width: 768px) {
-      width: 60px;
-      height: 60px;
-    }
   }
   .imgChat {
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-    @media (max-width: 768px) {
+  }
+  
+  @media (max-width: 768px) {
+    .button_Chat {
+      width: 60px;
+      height: 60px;
+    }
+    .imgChat {
       width: 20px;
       height: 20px;
     }
