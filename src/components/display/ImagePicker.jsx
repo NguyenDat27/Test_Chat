@@ -2,29 +2,18 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTheme } from '@/ThemeProvider.jsx';
 
-import imagePicker from '@/assets/images/imagepicker.svg';
-import uploadIcon from '@/assets/images/icons/upload.svg';
-
-export default function ImagePicker() {
+export default function ImagePicker({ selectedImages, onRemoveImage }) {
 
   const { theme } = useTheme();
 
-  const images = [
-    imagePicker,
-    imagePicker,
-    imagePicker,
-    imagePicker,
-  ];
+  console.log(selectedImages);
   
 
   return (
     <ImagePickerContainer className="image-picker" theme={theme}>
-      <ImageWrapper>
-        <img className='upload_icon' src={uploadIcon} alt="Icon Upload" />
-      </ImageWrapper>
-      {images.map((src, index) => (
+      {selectedImages.map((src, index) => (
         <ImageWrapper key={src + index}>
-          <CloseButton>&times;</CloseButton>
+          <CloseButton onClick={() => onRemoveImage(index)}>&times;</CloseButton>
           <img src={src} alt={`Image Picker ${index}`} />
         </ImageWrapper>
       ))}

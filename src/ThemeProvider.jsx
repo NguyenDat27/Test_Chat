@@ -6,10 +6,8 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState("");
 
   useEffect(() => {
-    
-    const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    console.log("Dark Mode Media Query", darkModeMediaQuery.matches);
+    const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     setTheme(darkModeMediaQuery.matches ? "dark" : "light");
 
@@ -18,8 +16,6 @@ export const ThemeProvider = ({ children }) => {
     };
 
     darkModeMediaQuery.addEventListener("change", handleChange);
-
-    console.log("Theme Context", theme);
 
     return () => {
       darkModeMediaQuery.removeEventListener("change", handleChange);

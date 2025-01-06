@@ -32,5 +32,6 @@ export default defineConfig({
         name: 'LiveChat',
       },
     },
+    cssCodeSplit: false,
   },
 });

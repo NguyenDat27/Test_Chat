@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTheme } from "@/ThemeProvider.jsx";
 import EmojiPicker from "@/components/display/EmojiPicker.jsx";
@@ -21,15 +21,37 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
   const [inputStr, setInputStr] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [imageList, setImageList] = useState([]);
+
+  const fileInputRef = useRef(null);
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
 
   const onEmojiClick = (EmojiClickData) => {
     setInputStr(prev => prev + EmojiClickData.emoji);
     setShowEmojiPicker(false);
   }
 
-  const handleChange = () => {
-    setShowImagePicker(pre => !pre);
-  }
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    const imageUrls = files.map(file => URL.createObjectURL(file));
+    setImageList(prevImages => [...prevImages, ...imageUrls]);
+    setShowImagePicker(true);
+  };
+
+  const handleRemoveImage = (index) => {
+    setImageList(prevImages => prevImages.filter((_, i) => i !== index));
+  };
+
+  useEffect(() => {
+    if (imageList.length === 0) {
+      setShowImagePicker(false);
+    }
+  }, [imageList]);
+
+
 
   return (
     <>
@@ -57,7 +79,7 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
           </div>
           <div className="liveChat_dialog">
             {showEmojiPicker && <EmojiPicker onEmojiClick={onEmojiClick} />}
-            {showImagePicker && <ImagePicker/>}
+            {showImagePicker && <ImagePicker selectedImages={imageList} onRemoveImage={handleRemoveImage}/>}
             <div className="message_item_ask_container">
               <div className="message_item_ask">
                 <div className="message_item_desc desc_ask">
@@ -79,6 +101,7 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
                 <div className="message_item_desc desc_feedback">
                   <p className="desc_text desc_feedback_text">
                     I'm doing well, thank you!
+                    <br/>
                     How can I help you today?
                   </p>
                 </div>
@@ -122,7 +145,7 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
                 alt="emoji" 
                 onClick={() => setShowEmojiPicker((val) => !val)}
               />
-              <input className="input"
+              <input className="chat_input"
                 type="text"
                 placeholder="Reply ..." 
                 value={inputStr}
@@ -137,7 +160,14 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
                     : imageLightIcon
                 }
                 alt="upload"
-                onClick={handleChange}
+                onClick={handleImageClick}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                ref={fileInputRef}
+                onChange={handleFileChange}
               />
               <div className="button_send">
                   <img className="arrow" src={arrowIcon} alt="arrow" />
@@ -497,17 +527,18 @@ const LiveChatWrapper = styled.section`
   }
   .input_container {
     display: flex;
-    gap: 20px;
     img {
       cursor: pointer;
+      margin-right: 20px;
     }
-    .input {
+    .chat_input {
       color: ${(props) => props.theme === "dark" ? "#FFF" : "#0d082c"};
       background-color: transparent;
-      outline: none;
+      // outline: none;
+      // width: 200px;
     }
     @media (max-width: 360px) {
-      gap: 10px;
+      gap: 5px;
     } 
   }
   .button_container {
@@ -528,6 +559,9 @@ const LiveChatWrapper = styled.section`
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    input {
+      display: none;
     }
     @media (max-width: 360px) {
       gap: 10px;
