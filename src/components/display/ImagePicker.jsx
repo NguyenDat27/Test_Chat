@@ -14,7 +14,7 @@ export default function ImagePicker({ selectedImages, onRemoveImage }) {
       {selectedImages.map((src, index) => (
         <ImageWrapper key={src + index}>
           <CloseButton onClick={() => onRemoveImage(index)}>&times;</CloseButton>
-          <img src={src} alt={`Image Picker ${index}`} />
+            <img src={src} alt={`Image Picker ${index}`} />
         </ImageWrapper>
       ))}
     </ImagePickerContainer>

@@ -3,6 +3,14 @@ import styled, { keyframes } from "styled-components";
 import { useTheme } from "@/ThemeProvider.jsx";
 import EmojiPicker from "@/components/display/EmojiPicker.jsx";
 import ImagePicker from"@/components/display/ImagePicker.jsx";
+import { handleImageClick, 
+  onEmojiClick, 
+  handleFileChange, 
+  handleRemoveImage, 
+  handleInput, 
+  handlePaste,
+  isUrlValue } from '@/utils/liveChatHandler.jsx';
+
 
 // import svg
 import cIcon from "@/assets/images/icons/c.svg";
@@ -26,59 +34,6 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
 
   const fileInputRef = useRef(null);
 
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const onEmojiClick = (EmojiClickData) => {
-    setInputStr(prev => prev + EmojiClickData.emoji);
-    setShowEmojiPicker(false);
-  }
-
-  const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
-
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        setImageList((prevList) => [...prevList, event.target.result]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleRemoveImage = (index) => {
-    setImageList(prevImages => prevImages.filter((_, i) => i !== index));
-  };
-
-  const handleInput = (e) => {
-    let html = e.currentTarget.innerHTML;
-    html = html.replace(/<br>/g, '<br/>');
-    html = html.replace(/&nbsp;/g, ' ');
-    setInputStr(html);
-
-  };
-
-  const handlePaste = (event) => {
-    event.preventDefault();
-    const clipboardData = event.clipboardData;
-    const items = clipboardData.items;
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf("image") !== -1) {
-        const file = items[i].getAsFile();
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          setImageList((prevList) => [...prevList, event.target.result]);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        const text = clipboardData.getData("text");
-        document.execCommand("insertText", false, text);
-      }
-    }
-  };
-
   useEffect(() => {
     if (imageList.length > 0) {
       setShowImagePicker(true);
@@ -87,30 +42,12 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
     }
   }, [imageList]);
 
-
-  // Hàm kiểm tra url
-  const isValidURL = (str) => {
-    const pattern = new RegExp('^(https?:\\/\\/)?'+
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+
-      '((\\d{1,3}\\.){3}\\d{1,3}))'+
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-      '(\\?[;&a-z\\d%_.~+=-]*)?'+
-      '(\\#[-a-z\\d_]*)?$','i');
-    return !!pattern.test(str);
-  };
-
   const handleSubmit = () => {
     console.log("input", inputStr);
     console.log("image", imageList);
-    const url = isValidURL(inputStr);
-
-    if (url) {
-      console.log("url", inputStr);
-    } else {
-      console.log("text", inputStr);
-    }
-    
   };
+
+  const checkString = "https://www.facebook.com/?locale=vi_VN";
   return (
     <>
       <LiveChatWrapper theme={theme} isLiveChatVisible={isLiveChatVisible}>
@@ -136,14 +73,20 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
             </div>
           </div>
           <div className="liveChat_dialog">
-            {showEmojiPicker && <EmojiPicker onEmojiClick={onEmojiClick} />}
-            {showImagePicker && <ImagePicker selectedImages={imageList} onRemoveImage={handleRemoveImage}/>}
+            {showEmojiPicker && <EmojiPicker onEmojiClick={(emojiData) => onEmojiClick(emojiData, setInputStr, setShowEmojiPicker)} />}
+            {showImagePicker && <ImagePicker selectedImages={imageList} onRemoveImage={(index) => handleRemoveImage(index, setImageList)} />}
             <div className="message_item_ask_container">
               <div className="message_item_ask">
-                <div className="message_item_desc desc_ask">
-                  <p className="desc_text desc_ask_text">
-                    I have a question about the return policy for a product I purchased.
-                  </p>
+                  <div className="message_item_desc desc_ask">
+                  { isUrlValue(checkString) ? (
+                    <a href={checkString} className="desc_text desc_ask_text">
+                      {checkString}
+                    </a>
+                  ): (
+                    <p className="desc_text desc_ask_text">
+                      {checkString}
+                    </p>
+                  )}
                 </div>
                 <div className="ask_time">
                   <p className="time_text">08:16 AM</p>
@@ -195,23 +138,23 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
             </div>
           </div>
           <div className="liveChat_input">
-            <div className="input_container">
-              <img 
+            <div className="emoji_input">
+              <img className="emoji_icon"
                 src={theme === 'dark' 
                   ? emojiDarkIcon
                   : emojiLightIcon} 
                 alt="emoji" 
                 onClick={() => setShowEmojiPicker((val) => !val)}
               />
+              <p
+                className="chat_input"
+                contentEditable 
+                onInput={(e) => handleInput(e, setInputStr)}
+                onPaste={(e) => handlePaste(e, setImageList)}
+                suppressContentEditableWarning={true}
+                dangerouslySetInnerHTML={{ __html: inputStr }}>
+              </p>
             </div>
-            <p
-              className="chat_input"
-              contentEditable 
-              onInput={handleInput}
-              onPaste={handlePaste}
-              suppressContentEditableWarning={true}
-              placeholder="Reply...">
-            </p>
             <div className="button_container">
               <img
                 src={
@@ -220,14 +163,14 @@ export default function LiveChat({ toggleLiveChat, isLiveChatVisible }) {
                     : imageLightIcon
                 }
                 alt="upload"
-                onClick={handleImageClick}
+                onClick={() => handleImageClick(fileInputRef)}
               />
               <input
                 type="file"
                 accept="image/*"
                 multiple
                 ref={fileInputRef}
-                onChange={handleFileChange}
+                onChange={(e) => handleFileChange(e, setImageList)}
               />
               <div className="button_send" onClick={handleSubmit}>
                   <img className="arrow" src={arrowIcon} alt="arrow" />
@@ -515,6 +458,9 @@ const LiveChatWrapper = styled.section`
     gap: 8px;
     align-self: stretch;
     border-radius: 0px 10px 10px 10px;
+    a {
+      text-decoration: underline;
+    }
   }
   .desc_feedback {
     background: ${(props) => props.theme === "dark" ? "#1d1748" : "#f1f7ff"};
@@ -564,7 +510,6 @@ const LiveChatWrapper = styled.section`
   }
   .liveChat_input {
     display: flex;
-    position: relative;
     padding: 20px 30px;
     justify-content: space-between;
     align-items: center;
@@ -579,32 +524,34 @@ const LiveChatWrapper = styled.section`
       border-radius: 0;
     }
     @media (max-height: 760px) {
-      padding: 10px 20px;
-      height: 15%;
+      height: 20%;
       border-radius: 0;
     }
+  }
+  .emoji_input {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    align-self: stretch;
   }
   .chat_input {
     color: ${(props) => props.theme === "dark" ? "#FFF" : "#0d082c"};
     background-color: ${(props) => props.theme === "dark" ? "black" : "#f0f2f5"};
     outline: none;
-    position: absolute;
     overflow-y: auto;
     max-height: 60px;
-    width: 50%;
-    left: 65px;
+    min-width: 200px;
+    max-width: 400px;
     border-radius: 10px;
     padding: 5px;
-  }
-  .input_container {
-    display: flex;
-    img {
-      cursor: pointer;
-      margin-right: 20px;
+    @media (max-width: 400px) {
+      max-width: 200px;
     }
-    @media (max-width: 360px) {
-      gap: 5px;
-    } 
+  }
+  .emoji_icon {
+    cursor: pointer;
+    left: 30px;
+    bottom: 30px;
   }
   .button_container {
     display: flex;
